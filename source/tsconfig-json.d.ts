@@ -966,7 +966,7 @@ export namespace TsConfigJson {
 		strict?: boolean;
 
 		/**
-		Enable stricter checking of of the `bind`, `call`, and `apply` methods on functions.
+		Enable stricter checking of the `bind`, `call`, and `apply` methods on functions.
 
 		@default false
 		*/
