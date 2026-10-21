@@ -138,7 +138,7 @@ type OmitDeepObjectWithOnePath<ObjectT extends object, P extends string | number
 			: ObjectT;
 
 /**
-Omit one path from from the given array.
+Omit one path from the given array.
 
 It replaces the item to `unknown` at the given index.
 
