@@ -5,7 +5,7 @@ import type {StringToArray} from './string-to-array.d.ts';
 /**
 Returns a string slice of a given range, just like `String#slice()`.
 
-@see {ArraySlice}
+@see {@link ArraySlice}
 
 @example
 ```
