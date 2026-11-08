@@ -126,3 +126,44 @@ expectType<{1: {0: number}}>(numberTest2);
 
 declare const numberTest3: PickDeep<Testing, '2.0'>;
 expectType<{2?: {0: number}}>(numberTest3);
+
+// Preserve `null`/`undefined` union members of picked properties
+// https://github.com/sindresorhus/type-fest/issues/880
+type Owner = {
+	name: string;
+	age: number;
+};
+type Pet = {
+	name: string;
+	age: number;
+	owner: Owner | null;
+};
+
+declare const nullableOwner: PickDeep<Pet, 'name' | 'owner.name'>;
+expectType<{name: string; owner: {name: string} | null}>(nullableOwner);
+
+// `null` and `undefined` are preserved for required properties
+type NullableOwner = {
+	owner: Owner | null | undefined;
+};
+declare const nullableOwner2: PickDeep<NullableOwner, 'owner.name'>;
+expectType<{owner: {name: string} | null | undefined}>(nullableOwner2);
+
+// Optional properties stay optional and don't get an explicit `undefined` member
+type OptionalOwner = {
+	owner?: Owner;
+};
+declare const optionalOwner: PickDeep<OptionalOwner, 'owner.name'>;
+expectType<{owner?: {name: string}}>(optionalOwner);
+
+// Nullable containers of arrays keep their `null`
+type Owners = {
+	owners: Owner[];
+};
+type NullableOwners = {
+	owners: Owner[] | null;
+};
+declare const nullableOwners: PickDeep<NullableOwners, 'owners.0.name'>;
+expectType<{owners: [{name: string}] | null}>(nullableOwners);
+declare const nonNullableOwners: PickDeep<Owners, 'owners.0.name'>;
+expectType<{owners: [{name: string}]}>(nonNullableOwners);

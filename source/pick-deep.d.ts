@@ -45,6 +45,16 @@ type NameConfig = PickDeep<Configuration, 'userConfig.name'>;
 type User = PickDeep<PartialDeep<Configuration>, 'userConfig.name' | 'userConfig.age'>;
 //=> {userConfig?: {name?: string; age?: number}}
 
+// Supports nullable properties
+type Pet = {
+	name: string;
+	owner: {
+		name: string;
+	} | null;
+};
+type OwnerName = PickDeep<Pet, 'name' | 'owner.name'>;
+//=> {name: string; owner: {name: string} | null}
+
 // Supports array
 type AddressConfig = PickDeep<Configuration, 'userConfig.address.0'>;
 //=> {
@@ -95,7 +105,7 @@ type PickDeepObject<RecordType extends object, P extends string | number> =
 	P extends `${infer RecordKeyInPath}.${infer SubPath}`
 		? ObjectValue<RecordType, RecordKeyInPath> extends infer ObjectV
 			? IsNever<ObjectV> extends false
-				? BuildObject<RecordKeyInPath, InternalPickDeep<NonNullable<ObjectV>, SubPath>, RecordType>
+				? BuildObject<RecordKeyInPath, PreserveNullish<InternalPickDeep<NonNullable<ObjectV>, SubPath>, ObjectV>, RecordType>
 				: never
 			: never
 		: ObjectValue<RecordType, P> extends infer ObjectV
@@ -103,6 +113,20 @@ type PickDeepObject<RecordType extends object, P extends string | number> =
 				? BuildObject<P, ObjectV, RecordType>
 				: never
 			: never;
+
+/**
+Reattach the `null` and `undefined` union members of the original value, which are stripped by `NonNullable` to allow recursing into the picked value.
+
+@example
+```
+PreserveNullish<{name: string}, Owner | null>;
+//=> {name: string} | null
+```
+*/
+type PreserveNullish<Picked, Original> =
+	[Picked] extends [never]
+		? never
+		: Picked | Extract<Original, null | undefined>;
 
 /**
 Pick an array from the given array by one path.
